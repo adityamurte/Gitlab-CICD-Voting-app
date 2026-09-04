@@ -1,0 +1,8 @@
+stages:
+  - test
+  - security
+  - build
+  - scan
+  - push
+  - update-gitops
+
