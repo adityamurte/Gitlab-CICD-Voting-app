@@ -1,6 +1,7 @@
 stages:
   - test
   - gitleaks
+  - trivy-fs
 
 test-vote:
   stage: test
@@ -29,13 +30,27 @@ test-worker:
     - test_runner
   script:
     - cd worker
-    - curl -I --connect-timeout 10 https://api.nuget.org/v3/index.json
+#   - curl -I --connect-timeout 10 https://api.nuget.org/v3/index.json #we can remove this line if we are sure that nuget.org is reachable from the runner
     - dotnet build
 
 gitleaks:
   stage: gitleaks
-  image: zricethezav/gitleaks:latest
+  image: 
+    name: zricethezav/gitleaks:latest
+    entrypoint:
+      - ""
   tags:
     - test_runner
   script:
     - gitleaks detect --source . --verbose --redact
+
+trivy-fs:
+  stage: trivy-fs
+  image:
+    name: aquasec/trivy:latest
+    entrypoint:
+      - ""
+  tags:
+    - test_runner
+  script:
+    - trivy fs --scanners vuln,secret,misconfig --exit-code 1 --severity HIGH,CRITICAL .
