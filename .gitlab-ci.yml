@@ -1,8 +1,31 @@
 stages:
   - test
-  - security
-  - build
-  - scan
-  - push
-  - update-gitops
 
+test-vote:
+  stage: test
+  image: python:3.12
+  tags:
+    - test_runner
+  script:
+    - cd vote
+    - pip install -r requirements.txt
+    - python -m compileall .
+
+test-result:
+  stage: test
+  image: node:20
+  tags:
+    - test_runner
+  script:
+    - cd result
+    - npm ci
+    - npm test
+
+test-worker:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:7.0
+  tags:
+    - test_runner
+  script:
+    - cd worker
+    - dotnet build
