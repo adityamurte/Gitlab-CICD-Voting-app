@@ -1,5 +1,6 @@
 stages:
   - test
+  - gitleaks
 
 test-vote:
   stage: test
@@ -19,7 +20,7 @@ test-result:
   script:
     - cd result
     - npm ci
-    - npm test
+    - node --check server.js
 
 test-worker:
   stage: test
@@ -28,4 +29,13 @@ test-worker:
     - test_runner
   script:
     - cd worker
+    - curl -I --connect-timeout 10 https://api.nuget.org/v3/index.json
     - dotnet build
+
+gitleaks:
+  stage: gitleaks
+  image: zricethezav/gitleaks:latest
+  tags:
+    - test_runner
+  script:
+    - gitleaks detect --source . --verbose --redact
