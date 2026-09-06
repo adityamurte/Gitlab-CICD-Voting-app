@@ -17,3 +17,15 @@ spec:
       containers:
       - image: dockersamples/examplevotingapp_worker
         name: worker
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+          - name: worker-vol
+            mountPath: /tmp
+      volumes:
+        - name: worker-vol
+          emptyDir: {}

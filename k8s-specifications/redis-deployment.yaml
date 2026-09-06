@@ -17,6 +17,16 @@ spec:
       containers:
       - image: redis:alpine
         name: redis
+        #added this after trivy scan warning
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - SETUID
+            - SETGID
         ports:
         - containerPort: 6379
           name: redis

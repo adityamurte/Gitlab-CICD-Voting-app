@@ -17,6 +17,12 @@ spec:
       containers:
       - image: dockersamples/examplevotingapp_result
         name: result
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
         ports:
         - containerPort: 80
           name: result

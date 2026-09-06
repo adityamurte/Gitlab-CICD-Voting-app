@@ -17,6 +17,18 @@ spec:
       containers:
       - image: dockersamples/examplevotingapp_vote
         name: vote
+        volumeMounts:
+          - name: vote-vol
+            mountPath: /tmp
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
         ports:
         - containerPort: 80
           name: vote
+      olumes:
+        - name: vote-vol
+          emptyDir: {}
