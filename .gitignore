@@ -4,3 +4,6 @@ bin/
 obj/
 .vs/
 node_modules/
+
+1-Scan-Trivy.md
+2-Scan-Trivy.md
