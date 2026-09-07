@@ -3,6 +3,7 @@ stages:
   - gitleaks
   - trivy-fs
   - build-sonar
+  - build-image
 
 test-vote:
   stage: test
@@ -75,3 +76,33 @@ build-sonar:
     - if: $CI_COMMIT_BRANCH == 'master'
     - if: $CI_COMMIT_BRANCH == 'main'
     - if: $CI_COMMIT_BRANCH == 'develop'
+
+build-result:
+  stage: build-image
+  image: docker:cli
+  services:
+    - docker:dind
+  tags:
+    - test_runner
+  script:
+    - docker build -t result:$CI_COMMIT_SHORT_SHA ./result
+
+build-vote:
+  stage: build-image
+  image: docker:cli
+  services:
+    - docker:dind
+  tags:
+    - test_runner
+  script:
+    - docker build -t vote:$CI_COMMIT_SHORT_SHA ./vote
+
+build-worker:
+  stage: build-image
+  image: docker:cli
+  services:
+    - docker:dind
+  tags:
+    - test_runner
+  script:
+    - docker build -t worker:$CI_COMMIT_SHORT_SHA ./worker
