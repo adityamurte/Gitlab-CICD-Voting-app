@@ -3,7 +3,7 @@ stages:
   - gitleaks
   - trivy-fs
   - build-sonar
-  - build-image
+  - b
 
 test-vote:
   stage: test
