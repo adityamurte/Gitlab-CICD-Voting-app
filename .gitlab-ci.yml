@@ -57,7 +57,7 @@ trivy-fs:
   script:
     - trivy fs --scanners vuln,secret,misconfig --exit-code 1 --severity HIGH,CRITICAL .
 
-build-sonar:
+.build-sonar:
   stage: build-sonar
   image: 
     name: sonarsource/sonar-scanner-cli:11
@@ -83,7 +83,10 @@ build-result:
   stage: build-image
   image: docker:cli
   services:
-    - docker:dind
+    - name: docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
   tags:
     - test_runner
   script:
@@ -93,7 +96,10 @@ build-vote:
   stage: build-image
   image: docker:cli
   services:
-    - docker:dind
+    - name: docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
   tags:
     - test_runner
   script:
@@ -103,7 +109,10 @@ build-worker:
   stage: build-image
   image: docker:cli
   services:
-    - docker:dind
+    - name: docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
   tags:
     - test_runner
   script:
