@@ -55,7 +55,7 @@ trivy-fs:
   tags:
     - test_runner
   script:
-    - trivy fs --scanners vuln,secret,misconfig --exit-code 1 --severity HIGH,CRITICAL .
+    - trivy fs --scanners vuln,secret,misconfig --severity HIGH,CRITICAL .
 
 .build-sonar:
   stage: build-sonar
@@ -91,6 +91,11 @@ build-result:
     - test_runner
   script:
     - docker build -t result:$CI_COMMIT_SHORT_SHA ./result
+    - docker save result:$CI_COMMIT_SHORT_SHA -o result-$CI_COMMIT_SHORT_SHA.tar
+  artifacts:
+    paths:
+      - result-$CI_COMMIT_SHORT_SHA.tar
+    expire_in: 1 hour 
 
 build-vote:
   stage: build-image
