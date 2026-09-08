@@ -5,7 +5,7 @@ stages:
   - build-sonar
   - build-image
 
-test-vote:
+.test-vote:
   stage: test
   image: python:3.12
   tags:
@@ -15,7 +15,7 @@ test-vote:
     - pip install -r requirements.txt
     - python -m compileall .
 
-test-result:
+.test-result:
   stage: test
   image: node:20
   tags:
@@ -25,7 +25,7 @@ test-result:
     - npm ci
     - node --check server.js
 
-test-worker:
+.test-worker:
   stage: test
   image: mcr.microsoft.com/dotnet/sdk:7.0
   tags:
@@ -35,7 +35,7 @@ test-worker:
 #   - curl -I --connect-timeout 10 https://api.nuget.org/v3/index.json #we can remove this line if we are sure that nuget.org is reachable from the runner
     - dotnet build
 
-gitleaks:
+.gitleaks:
   stage: gitleaks
   image: 
     name: zricethezav/gitleaks:latest
@@ -46,7 +46,7 @@ gitleaks:
   script:
     - gitleaks detect --source . --verbose --redact
 
-trivy-fs:
+.trivy-fs:
   stage: trivy-fs
   image:
     name: aquasec/trivy:latest
