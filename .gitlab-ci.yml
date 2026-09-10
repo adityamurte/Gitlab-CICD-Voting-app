@@ -84,24 +84,26 @@ build-result:
   image: docker:cli
   services:
     - name: docker:dind
-  variables:
+      command:
+        - --mtu=1400
+  variables:  
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
   tags:
     - test_runner
   script:
     - docker build -t result:$CI_COMMIT_SHORT_SHA ./result
-    - docker save result:$CI_COMMIT_SHORT_SHA -o result-$CI_COMMIT_SHORT_SHA.tar
-  artifacts:
-    paths:
-      - result-$CI_COMMIT_SHORT_SHA.tar
-    expire_in: 1 hour 
+    - apk add --no-cache curl
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+    - trivy image --severity HIGH,CRITICAL result:$CI_COMMIT_SHORT_SHA
 
 build-vote:
   stage: build-image
   image: docker:cli
   services:
     - name: docker:dind
+      command:
+        - --mtu=1400
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -109,12 +111,17 @@ build-vote:
     - test_runner
   script:
     - docker build -t vote:$CI_COMMIT_SHORT_SHA ./vote
+    - apk add --no-cache curl
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+    - trivy image --severity HIGH,CRITICAL vote:$CI_COMMIT_SHORT_SHA
 
 build-worker:
   stage: build-image
   image: docker:cli
   services:
     - name: docker:dind
+      command:
+        - --mtu=1400
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
@@ -122,3 +129,6 @@ build-worker:
     - test_runner
   script:
     - docker build -t worker:$CI_COMMIT_SHORT_SHA ./worker
+    - apk add --no-cache curl
+    - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+    - trivy image --severity HIGH,CRITICAL worker:$CI_COMMIT_SHORT_SHA
