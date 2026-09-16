@@ -4,6 +4,7 @@ stages:
   - trivy-fs
   - build-sonar
   - build-image
+  - update-gitops
 
 .test-vote:
   stage: test
@@ -144,3 +145,33 @@ build-worker:
     - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
     - docker tag worker:$CI_COMMIT_SHORT_SHA "$ECR_REGISTRY/$ECR_REPOSITORY_WORKER:$CI_COMMIT_SHORT_SHA"
     - docker push "$ECR_REGISTRY/$ECR_REPOSITORY_WORKER:$CI_COMMIT_SHORT_SHA"
+
+update-gitops:
+  stage: update-gitops
+  image: alpine:latest
+  tags:
+    - test_runner
+  before_script:
+    - apk add --no-cache curl yq git
+  script:
+
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@<gitlab-host>/<namespace>/voting-app-gitops.git
+    - cd voting-app-gitops
+    
+    - git config --global user.name
+    - git config --global user.email 
+
+    - git checkout -b ci/update-images-${CI_COMMIT_SHORT_SHA}
+
+    - yq -i '(.images[] | select(.name == "dockersamples/examplevotingapp_vote")).newTag = env(CI_COMMIT_SHORT_SHA)' k8s/overlays/dev/kustomization.yaml
+    - yq -i '(.images[] | select(.name == "dockersamples/examplevotingapp_result")).newTag = env(CI_COMMIT_SHORT_SHA)' k8s/overlays/dev/kustomization.yaml
+    - yq -i '(.images[] | select(.name == "dockersamples/examplevotingapp_worker")).newTag = env(CI_COMMIT_SHORT_SHA)' k8s/overlays/dev/kustomization.yaml  
+    
+    - yq '.images' k8s/overlays/dev/kustomization.yaml
+    - git diff
+
+    - git add k8s/overlays/dev/kustomization.yaml
+    - git commit -m "Update images to ${CI_COMMIT_SHORT_SHA}"
+    - git push origin HEAD  
+
+
