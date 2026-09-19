@@ -179,8 +179,9 @@ update-gitops:
 
     - |
       curl --fail --request POST \
-        --header "JOB-TOKEN: "${GITOPS_USERNAME}:${GITOPS_TOKEN}"" \
-        --data "source_branch=${GITOPS_BRANCH}" \
+        --header "PRIVATE-TOKEN: ${GITOPS_TOKEN}" \
+        --data "source_branch=ci/update-images-${CI_COMMIT_SHORT_SHA}" \
         --data "target_branch=main" \
         --data-urlencode "title=Update images to ${CI_COMMIT_SHORT_SHA}" \
         "${CI_API_V4_URL}/projects/${GITOPS_PROJECT_ID}/merge_requests"
+
